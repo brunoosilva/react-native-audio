@@ -2,43 +2,36 @@ package com.rnim.rn.audio;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.media.MediaRecorder;
+import android.os.Build;
+import android.os.Environment;
+import android.util.Base64;
+import android.util.Log;
 
-import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContextBaseJavaModule;
-import com.facebook.react.bridge.ReactMethod;
+import androidx.core.content.ContextCompat;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContextBaseJavaModule;
+import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import android.content.pm.PackageManager;
-import android.os.Build;
-import android.os.Environment;
-import android.media.MediaRecorder;
-import android.media.AudioManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.util.Base64;
-import android.util.Log;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
-
-import java.io.FileInputStream;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.IllegalAccessException;
-import java.lang.NoSuchMethodException;
 
 class AudioRecorderManager extends ReactContextBaseJavaModule {
 
@@ -60,7 +53,7 @@ class AudioRecorderManager extends ReactContextBaseJavaModule {
   private boolean includeBase64 = false;
   private Timer timer;
   private StopWatch stopWatch;
-  
+
   private boolean isPauseResumeCapable = false;
   private Method pauseMethod = null;
   private Method resumeMethod = null;
@@ -70,7 +63,7 @@ class AudioRecorderManager extends ReactContextBaseJavaModule {
     super(reactContext);
     this.context = reactContext;
     stopWatch = new StopWatch();
-    
+
     isPauseResumeCapable = Build.VERSION.SDK_INT > Build.VERSION_CODES.M;
     if (isPauseResumeCapable) {
       try {
@@ -146,23 +139,23 @@ class AudioRecorderManager extends ReactContextBaseJavaModule {
   }
 
   private int getAudioEncoderFromString(String audioEncoder) {
-   switch (audioEncoder) {
-     case "aac":
-       return MediaRecorder.AudioEncoder.AAC;
-     case "aac_eld":
-       return MediaRecorder.AudioEncoder.AAC_ELD;
-     case "amr_nb":
-       return MediaRecorder.AudioEncoder.AMR_NB;
-     case "amr_wb":
-       return MediaRecorder.AudioEncoder.AMR_WB;
-     case "he_aac":
-       return MediaRecorder.AudioEncoder.HE_AAC;
-     case "vorbis":
-      return MediaRecorder.AudioEncoder.VORBIS;
-     default:
-       Log.d("INVALID_AUDIO_ENCODER", "USING MediaRecorder.AudioEncoder.DEFAULT instead of "+audioEncoder+": "+MediaRecorder.AudioEncoder.DEFAULT);
-       return MediaRecorder.AudioEncoder.DEFAULT;
-   }
+    switch (audioEncoder) {
+      case "aac":
+        return MediaRecorder.AudioEncoder.AAC;
+      case "aac_eld":
+        return MediaRecorder.AudioEncoder.AAC_ELD;
+      case "amr_nb":
+        return MediaRecorder.AudioEncoder.AMR_NB;
+      case "amr_wb":
+        return MediaRecorder.AudioEncoder.AMR_WB;
+      case "he_aac":
+        return MediaRecorder.AudioEncoder.HE_AAC;
+      case "vorbis":
+        return MediaRecorder.AudioEncoder.VORBIS;
+      default:
+        Log.d("INVALID_AUDIO_ENCODER", "USING MediaRecorder.AudioEncoder.DEFAULT instead of "+audioEncoder+": "+MediaRecorder.AudioEncoder.DEFAULT);
+        return MediaRecorder.AudioEncoder.DEFAULT;
+    }
   }
 
   private int getOutputFormatFromString(String outputFormat) {
@@ -302,7 +295,7 @@ class AudioRecorderManager extends ReactContextBaseJavaModule {
         return;
       }
     }
-    
+
     isPaused = false;
     promise.resolve(null);
   }
